@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<head runat="server">
+    <title></title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        #mapid { position: absolute; top: 0;bottom: 0;left: 0;right: 0;}
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div id="mapid">
+        </div>
+    </form>
+    </script>
+    <script>
+        var data = {
+            // lat.data[i][1] as latitude
+            lat: {
+                data: [
+                    [0, 51.509],
+                    [0, 51.503],
+                    [0, 51.51]
+                ]
+            },
+            // lng.data[i][1] as longtitude
+            lng: {
+                data: [
+                    [0, -0.08],
+                    [0, -0.06],
+                    [0, -0.047]
+                ]
+            }
+        };
+    
+       
+        const municipality = getData();
+        bindMap(data, municipality);
+
+
+        function bindMap(data, municipality) {
+
+            //var element = chart.selector.replace('#', '');
+            var map = L.map('mapid');
+
+            L.tileLayer(
+                'https://api.maptiler.com/maps/dataviz/{z}/{x}/{y}.png?key=LNBB428OE6OdS1SfSmCd', {
+                attribution: 'Data © <a href="http://osm.org/copyright">OpenStreetMap</a>',
+                maxZoom: 18
+            }).addTo(map);
+
+            var center = [10.275523, 123.903119];//[51.505, -0.09];
+            map.setView(center, 3);
+
+            for (var i = 0; i < data.lat.data.length; i++) {
+                center = [data.lat.data[i][1], data.lng.data[i][1]];
+            }
+            var polygon = L.polygon().addTo(map);
+        }
+        
+        async function getData(){
+            const response = await fetch("http://localhost:8000/coordinates.json");
+            const data = await response.json();
+            console.log(data);
+            return data;
+        }
+        // Call the function and handle the response using .then() and .catch()
+      
+    </script>
+</body>

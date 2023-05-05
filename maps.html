@@ -15,13 +15,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
 	<script>
         var cebuCityCoords;
-        var numberOfMunicipalities;
+        var cities;
         fetch('http://localhost:8000/coordinates.json')
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 cebuCityCoords = data.municipalities.find(m => m.name === 'CebuCity').coordinates;
-                numberOfMunicipalities = data.municipalities.length;
+                cities = data.municipalities
                 // Do something with the data
             })
             .then(data => {
@@ -35,36 +35,25 @@
       maxZoom: 18,
     }).addTo(mymap);
 
-        var cebuCity = L.polygon(cebuCityCoords, { 
-        color: 'blue',
-        fillColor: '#0066cc',
-        fillOpacity: 0.5,
-        }).addTo(mymap);
+    for (var i = 0; i < cities.length; i++) {
+      var city = cities[i];
+      var polygon = L.polygon(city.coordinates, {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5
+      }).addTo(mymap);
 
-        var mandaue = L.circle([10.3300, 123.9344], {
-        color: 'blue',
-        fillColor: '#0066cc',
-        fillOpacity: 0.5,
-        radius: 5000
-        }).addTo(mymap);
-
-        cebuCity.on('click', function(e) {
-        var colors = ['#0066cc', '#ff6600', 'red'];
-        var currentColor = cebuCity.options.fillColor;
-        var currentIndex = colors.indexOf(currentColor);
-        var nextIndex = (currentIndex + 1) % colors.length;
-        var nextColor = colors[nextIndex];
-        cebuCity.setStyle({fillColor: nextColor});
+      (function(polygon) {
+        polygon.on('click', function(e) {
+          var colors = ['#8b0000', "#FF0000", '#FFCCCB', '#ffe200', '#bda800', '#525100', '#90ee90', '#66FF33'];
+          var currentColor = polygon.options.fillColor;
+          var currentIndex = colors.indexOf(currentColor);
+          var nextIndex = (currentIndex + 1) % colors.length;
+          var nextColor = colors[nextIndex];
+          polygon.setStyle({fillColor: nextColor});
         });
-
-        mandaue.on('click', function(e) {
-        var colors = ['#0066cc', '#ff6600', '#99ff99'];
-        var currentColor = mandaue.options.fillColor;
-        var currentIndex = colors.indexOf(currentColor);
-        var nextIndex = (currentIndex + 1) % colors.length;
-        var nextColor = colors[nextIndex];
-        mandaue.setStyle({fillColor: nextColor});
-        });
+      })(polygon);
+    }
     })
     .catch(error => console.error(error));
 	</script>
