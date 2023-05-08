@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<style>
-		#mapid { height: 1500px; }
+		#mapid { height: 930px; }
 	</style>
 </head>
 <body>
@@ -23,76 +23,74 @@
 	<script>
         var cebuCityCoords;
         var cities;
-        fetch('http://192.168.111.78:8000/coordinates.json')
+        fetch('http://localhost:8000/coordinates.json')
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 cebuCityCoords = data.municipalities.find(m => m.name === 'CebuCity').coordinates;
                 cities = data.municipalities
-                // Do something with the data
-            })
-            .then(data => {
-            var mymap = L.map('mapid').setView([10.3157, 123.8854], 11);
+                // Do something with the data      
+                var mymap = L.map('mapid').setView([10.3157, 123.8854], 11);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-              maxZoom: 18,
-            }).addTo(mymap);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                  maxZoom: 18,
+                }).addTo(mymap);
 
 
-            for (var i = 0; i < cities.length; i++) {
-  var city = cities[i];
-  var polygon = L.polygon(city.coordinates, {
-    color: '#66FF33',
-    fillColor: '#66FF33',
-    fillOpacity: 0.8,
-    name: city.name,
-    level: city.level
-  }).addTo(mymap);
+                for (var i = 0; i < cities.length; i++) {
+                  var city = cities[i];
+                  var polygon = L.polygon(city.coordinates, {
+                    color: '#66FF33',
+                    fillColor: '#66FF33',
+                    fillOpacity: 0.8,
+                    name: city.name,
+                    level: city.level
+                  }).addTo(mymap);
 
-  (function(polygon) {
-    polygon.on('click', function(e) {
-      var popup = L.popup({
-        closeButton: false,
-        closeOnClick: false
-      });
-      popup.setLatLng(e.latlng);
-      popup.setContent('<div id="popup-content"></div>' + e.latlng.toString());
-      popup.openOn(mymap);
-      $('#popup-content').load('popup-content.html', function() {
-        // Add event listeners to the buttons
-        $('#popup-content button').on('click', function() {
-          console.log($(this).text());
-        });
-      });
-      console.log(polygon.options.level);
-      var percentageInput = $('#percentage-input');
-      percentageInput.val(polygon.options.level);
-      var municipalityName = $('#municipality-name');
-      municipalityName.text(polygon.options.name);
-      var colors = ['#8b0000', "#FF0000", '#FFCCCB', '#dbc300', '#bda800', '#525100', '#90ee90', '#66FF33'];
-      var currentColor = polygon.options.fillColor;
-      var currentIndex = colors.indexOf(currentColor);
-      var nextIndex = (currentIndex + 1) % colors.length;
-      var nextColor = colors[nextIndex];
-      polygon.setStyle({fillColor: nextColor});
-      polygon.setStyle({color: nextColor});
-    });
-  })(polygon);
-}
+                  (function(polygon) {
+                    polygon.on('click', function(e) {
+                      var popup = L.popup({
+                        closeButton: false,
+                        closeOnClick: false
+                      });
+                      popup.setLatLng(e.latlng);
+                      popup.setContent('<div id="popup-content"></div>' + e.latlng.toString());
+                      popup.openOn(mymap);
+                      $('#popup-content').load('popup-content.html', function() {
+                        // Add event listeners to the buttons
+                        $('#popup-content button').on('click', function() {
+                          console.log($(this).text());
+                        });
+                      });
+                      console.log(polygon.options.level);
+                      var percentageInput = $('#percentage-input');
+                      percentageInput.val(polygon.options.level);
+                      var municipalityName = $('#municipality-name');
+                      municipalityName.text(polygon.options.name);
+                      var colors = ['#8b0000', "#FF0000", '#FFCCCB', '#dbc300', '#bda800', '#525100', '#90ee90', '#66FF33'];
+                      var currentColor = polygon.options.fillColor;
+                      var currentIndex = colors.indexOf(currentColor);
+                      var nextIndex = (currentIndex + 1) % colors.length;
+                      var nextColor = colors[nextIndex];
+                      polygon.setStyle({fillColor: nextColor});
+                      polygon.setStyle({color: nextColor});
+                    });
+                  })(polygon);
+                }
 
-            // Bind an event listener to the map to close the popup when clicking outside of it
-            mymap.on('click', function(e) {
-              if (currentPopup) {
-                currentPopup.remove();
-                currentPopup = null;
-              }
-            });
+                // Bind an event listener to the map to close the popup when clicking outside of it
+                mymap.on('click', function(e) {
+                  if (currentPopup) {
+                    currentPopup.remove();
+                    currentPopup = null;
+                  }
+                });
 
-            })
-    .catch(error => console.error(error));
+                })
+                .catch(error => console.error(error));
 	</script>
 </body>
 </html>
