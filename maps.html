@@ -51,34 +51,36 @@
                   }).addTo(mymap);
 
                   (function(polygon) {
-                    polygon.on('click', function(e) {
-                      var popup = L.popup({
-                        closeButton: false,
-                        closeOnClick: false
-                      });
-                      popup.setLatLng(e.latlng);
-                      popup.setContent('<div id="popup-content"></div>' + e.latlng.toString());
-                      popup.openOn(mymap);
-                      $('#popup-content').load('popup-content.html', function() {
-                        // Add event listeners to the buttons
-                        $('#popup-content button').on('click', function() {
-                          console.log($(this).text());
-                        });
-                      });
-                      console.log(polygon.options.level);
-                      var percentageInput = $('#percentage-input');
-                      percentageInput.val(polygon.options.level);
-                      var municipalityName = $('#municipality-name');
-                      municipalityName.text(polygon.options.name);
-                      var colors = ['#8b0000', "#FF0000", '#FFCCCB', '#dbc300', '#bda800', '#525100', '#90ee90', '#66FF33'];
-                      var currentColor = polygon.options.fillColor;
-                      var currentIndex = colors.indexOf(currentColor);
-                      var nextIndex = (currentIndex + 1) % colors.length;
-                      var nextColor = colors[nextIndex];
-                      polygon.setStyle({fillColor: nextColor});
-                      polygon.setStyle({color: nextColor});
-                    });
-                  })(polygon);
+  polygon.on('click', function(e) {
+    var popup = L.popup();
+    popup.setLatLng(e.latlng);
+    popup.setContent('<div id="popup-content"></div>' + e.latlng.toString());
+    popup.openOn(mymap);
+    
+    $('#popup-content').load('popup-content.html', function() {
+      // Add event listeners to the buttons
+      $('#popup-content button').on('click', function() {
+        console.log($(this).text());
+      });
+      
+      // Set the actual content of the popup after the external content has been loaded
+      $('#popup-content').html('<p>This is the actual content of the popup.</p>');
+    });
+    
+    console.log(polygon.options.level);
+    var percentageInput = $('#percentage-input');
+    percentageInput.val(polygon.options.level);
+    var municipalityName = $('#municipality-name');
+    municipalityName.text(polygon.options.name);
+    var colors = ['#8b0000', "#FF0000", '#FFCCCB', '#dbc300', '#bda800', '#525100', '#90ee90', '#66FF33'];
+    var currentColor = polygon.options.fillColor;
+    var currentIndex = colors.indexOf(currentColor);
+    var nextIndex = (currentIndex + 1) % colors.length;
+    var nextColor = colors[nextIndex];
+    polygon.setStyle({fillColor: nextColor});
+    polygon.setStyle({color: nextColor});
+  });
+})(polygon);
                 }
 
                 // Bind an event listener to the map to close the popup when clicking outside of it
