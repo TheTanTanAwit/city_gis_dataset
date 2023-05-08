@@ -18,7 +18,6 @@
     <button id="update-btn">Update</button>
     <label for="municipality-name" id="municipality-name"></label>
   </div>
-  <script src="coordinates.json"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
 	<script>
         var cebuCityCoords;
@@ -27,7 +26,6 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                cebuCityCoords = data.municipalities.find(m => m.name === 'CebuCity').coordinates;
                 cities = data.municipalities
                 // Do something with the data      
                 var mymap = L.map('mapid').setView([10.3157, 123.8854], 11);
@@ -51,45 +49,77 @@
                   }).addTo(mymap);
 
                   (function(polygon) {
-  polygon.on('click', function(e) {
-    var popup = L.popup();
-    popup.setLatLng(e.latlng);
-    popup.setContent('<div id="popup-content"></div>' + e.latlng.toString());
-    popup.openOn(mymap);
-    
-    $('#popup-content').load('popup-content.html', function() {
-      // Add event listeners to the buttons
-      $('#popup-content button').on('click', function() {
-        console.log($(this).text());
-      });
-      
-      // Set the actual content of the popup after the external content has been loaded
-      $('#popup-content').html('<p>This is the actual content of the popup.</p>');
-    });
-    
-    console.log(polygon.options.level);
-    var percentageInput = $('#percentage-input');
-    percentageInput.val(polygon.options.level);
-    var municipalityName = $('#municipality-name');
-    municipalityName.text(polygon.options.name);
-    var colors = ['#8b0000', "#FF0000", '#FFCCCB', '#dbc300', '#bda800', '#525100', '#90ee90', '#66FF33'];
-    var currentColor = polygon.options.fillColor;
-    var currentIndex = colors.indexOf(currentColor);
-    var nextIndex = (currentIndex + 1) % colors.length;
-    var nextColor = colors[nextIndex];
-    polygon.setStyle({fillColor: nextColor});
-    polygon.setStyle({color: nextColor});
-  });
-})(polygon);
-                }
+                    polygon.on('click', function(e) {
+                      var popup = L.popup();
+                      popup.setLatLng(e.latlng);
+                      popup.setContent('<p>Hello world!</p>');
+                      popup.openOn(mymap);
+                      
+                      $.ajax({
+                        url: 'popup-content.html',
+                        dataType: 'html',
+                        success: function(data) {
+                          popup.setContent(data);
+                          var buttons = document.querySelectorAll('.popup-button');
+                          for (var i = 0; i < buttons.length; i++) {
+                            var button = buttons[i];
+                            button.addEventListener('click', createButtonFunction(i + 1, polygon, data));
+                          }
+                        }
+                      });
 
-                // Bind an event listener to the map to close the popup when clicking outside of it
-                mymap.on('click', function(e) {
-                  if (currentPopup) {
-                    currentPopup.remove();
-                    currentPopup = null;
+                      console.log(polygon.options.level);
+                      var percentageInput = $('#percentage-input');
+                      percentageInput.val(polygon.options.level);
+                      var municipalityName = $('#municipality-name');
+                      municipalityName.text(polygon.options.name);
+                      var colors = ['#8b0000', "#FF0000", '#FFCCCB', '#dbc300', '#bda800', '#525100', '#90ee90', '#66FF33'];
+                      var currentColor = polygon.options.fillColor;
+                      var currentIndex = colors.indexOf(currentColor);
+                      var nextIndex = (currentIndex + 1) % colors.length;
+                      var nextColor = colors[nextIndex];
+                      // polygon.setStyle({fillColor: nextColor});
+                      // polygon.setStyle({color: nextColor});
+                    });
+                  })(polygon);
+
+                  function createButtonFunction(buttonNumber, polygon, data) {
+                    console.log('createButtonFunction called with buttonNumber: ', buttonNumber);
+                    return function() {
+                      switch(buttonNumber){
+                        case 1:
+                          polygon.setStyle({fillColor: '#8b0000', color: '#8b0000'});
+                          var newData = data.municipalities.find(m => m.name === polygon.options.name).color;
+                          console.log(color);
+                          break;
+                        case 2:
+                          polygon.setStyle({fillColor: '#FF0000', color: '#FF0000'});
+                          break;
+                        case 3:
+                          polygon.setStyle({fillColor: '#FFCCCB', color: '#FFCCCB'});
+                          break;
+                        case 4:
+                          polygon.setStyle({fillColor: '#dbc300', color: '#dbc300'});
+                          break;
+                        case 5:
+                          polygon.setStyle({fillColor: '#bda800', color: '#bda800'});
+                          break;
+                        case 6:
+                          polygon.setStyle({fillColor: '#525100', color: '#525100'});
+                          break;
+                        case 7:
+                          polygon.setStyle({fillColor: '#90ee90', color: '#90ee90'});
+                          break;
+                        case 8:
+                          polygon.setStyle({fillColor: '#66FF33', color: '#66FF33'});
+                          polygon.options.fillColor = '#66FF33';
+
+                          break;
+                      }
+                    };
                   }
-                });
+
+                }
 
                 })
                 .catch(error => console.error(error));
